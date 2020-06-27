@@ -1,5 +1,8 @@
 # Changelog
 
+## 14.3.0
+- Precision metric added
+
 ## 14.2.2
 - `ml_dataframe` 0.2.0 supported
 

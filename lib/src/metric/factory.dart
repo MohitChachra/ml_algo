@@ -1,4 +1,5 @@
 import 'package:ml_algo/src/metric/classification/accuracy.dart';
+import 'package:ml_algo/src/metric/classification/precision.dart';
 import 'package:ml_algo/src/metric/metric.dart';
 import 'package:ml_algo/src/metric/metric_type.dart';
 import 'package:ml_algo/src/metric/regression/mape.dart';
@@ -15,6 +16,9 @@ class MetricFactory {
 
       case MetricType.accuracy:
         return const AccuracyMetric();
+
+      case MetricType.precision:
+        return const PrecisionMetric();
 
       default:
         throw UnsupportedError('Unsupported metric type $type');

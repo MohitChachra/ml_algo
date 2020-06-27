@@ -7,16 +7,23 @@ import 'package:ml_dataframe/ml_dataframe.dart';
 
 mixin AssessablePredictorMixin implements Assessable, Predictor {
   @override
-  double assess(DataFrame samples, Iterable<String> targetNames,
-      MetricType metricType) {
-    final splits = featuresTargetSplit(samples,
+  double assess(
+      DataFrame samples,
+      Iterable<String> targetNames,
+      MetricType metricType,
+  ) {
+    final splits = featuresTargetSplit(
+      samples,
       targetNames: targetNames,
     ).toList();
+    final metric = MetricFactory
+        .createByType(metricType);
+    final prediction = predict(splits[0])
+        .toMatrix(dtype);
+    final origLabels = splits[1]
+        .toMatrix(dtype);
 
-    final metric = MetricFactory.createByType(metricType);
-    final prediction = predict(splits[0]);
-    final origLabels = splits[1].toMatrix(dtype);
-
-    return metric.getScore(prediction.toMatrix(dtype), origLabels);
+    return metric
+        .getScore(prediction, origLabels);
   }
 }

@@ -1,3 +1,4 @@
+import 'package:ml_algo/src/common/exception/invalid_metric_type_exception.dart';
 import 'package:ml_algo/src/helpers/features_target_split.dart';
 import 'package:ml_algo/src/metric/factory.dart';
 import 'package:ml_algo/src/metric/metric_type.dart';
@@ -12,6 +13,10 @@ mixin AssessablePredictorMixin implements Assessable, Predictor {
       Iterable<String> targetNames,
       MetricType metricType,
   ) {
+    if (!allowedMetrics.contains(metricType)) {
+      throw InvalidMetricTypeException(metricType, allowedMetrics);
+    }
+
     final splits = featuresTargetSplit(
       samples,
       targetNames: targetNames,

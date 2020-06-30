@@ -10,7 +10,6 @@ dependencies:
   injector: ^1.0.8
   json_annotation: ^3.0.1
   json_serializable: ^3.3.0
-  l: ^1.1.1
   ml_dataframe: ^0.2.0
   ml_linalg: ^12.17.1
   quiver: ^2.0.2

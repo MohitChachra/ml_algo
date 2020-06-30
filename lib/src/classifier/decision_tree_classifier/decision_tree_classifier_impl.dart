@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:ml_algo/src/classifier/_mixins/classification_metrics_mixin.dart';
 import 'package:ml_algo/src/classifier/decision_tree_classifier/decision_tree_classifier.dart';
 import 'package:ml_algo/src/classifier/decision_tree_classifier/decision_tree_json_keys.dart';
 import 'package:ml_algo/src/common/serializable/serializable_mixin.dart';
@@ -20,7 +21,8 @@ part 'decision_tree_classifier_impl.g.dart';
 class DecisionTreeClassifierImpl
     with
         AssessablePredictorMixin,
-        SerializableMixin
+        SerializableMixin,
+        ClassificationMetricsMixin
     implements
         DecisionTreeClassifier {
 

@@ -2,6 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:ml_algo/src/common/serializable/serializable_mixin.dart';
 import 'package:ml_algo/src/helpers/add_intercept_if.dart';
 import 'package:ml_algo/src/predictor/assessable_predictor_mixin.dart';
+import 'package:ml_algo/src/regressor/_mixins/regression_metrics_mixin.dart';
 import 'package:ml_algo/src/regressor/linear_regressor/linear_regressor.dart';
 import 'package:ml_algo/src/regressor/linear_regressor/linear_regressor_json_keys.dart';
 import 'package:ml_dataframe/ml_dataframe.dart';
@@ -18,7 +19,8 @@ part 'linear_regressor_impl.g.dart';
 class LinearRegressorImpl
     with
         AssessablePredictorMixin,
-        SerializableMixin
+        SerializableMixin,
+        RegressionMetricsMixin
     implements
         LinearRegressor {
 

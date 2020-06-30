@@ -1,4 +1,5 @@
 import 'package:ml_algo/src/knn_solver/neigbour.dart';
+import 'package:ml_algo/src/metric/metric_type.dart';
 import 'package:ml_algo/src/regressor/knn_regressor/knn_regressor_impl.dart';
 import 'package:ml_dataframe/ml_dataframe.dart';
 import 'package:ml_linalg/dtype.dart';
@@ -147,6 +148,22 @@ void main() {
         ]));
 
         expect(regressor.predict(data).header, equals([targetName]));
+      });
+    });
+
+    group('allowedMetrics', () {
+      final regressor = KnnRegressorImpl(
+        'target',
+        KnnSolverMock(),
+        KernelMock(),
+        DType.float32,
+      );
+
+      test('should contain appropriate metrics', () {
+        expect(regressor.allowedMetrics, [
+          MetricType.mape,
+          MetricType.rmse,
+        ]);
       });
     });
   });

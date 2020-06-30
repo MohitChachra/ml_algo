@@ -1,5 +1,6 @@
 import 'package:ml_algo/src/classifier/knn_classifier/knn_classifier_impl.dart';
 import 'package:ml_algo/src/knn_solver/neigbour.dart';
+import 'package:ml_algo/src/metric/metric_type.dart';
 import 'package:ml_dataframe/ml_dataframe.dart';
 import 'package:ml_linalg/linalg.dart';
 import 'package:ml_tech/unit_testing/matchers/iterable_2d_almost_equal_to.dart';
@@ -462,11 +463,8 @@ void main() {
         final firstClassLabel = 1;
         final secondClassLabel = 2;
         final thirdClassLabel = 3;
-
         final unexpectedClassLabel = 100;
-
         final classLabels = [thirdClassLabel, firstClassLabel, secondClassLabel];
-
         final classifier = KnnClassifierImpl(
           'target',
           classLabels,
@@ -495,6 +493,23 @@ void main() {
         final actual = () => classifier.predictProbabilities(testFeatures);
 
         expect(actual, throwsException);
+      });
+    });
+
+    group('allowedMetrics', () {
+      test('should contain proper allowed metrics', () {
+        final classifier = KnnClassifierImpl(
+          'target',
+          [1, 0],
+          KernelMock(),
+          KnnSolverMock(),
+          DType.float32,
+        );
+
+        expect(classifier.allowedMetrics, [
+          MetricType.accuracy,
+          MetricType.precision,
+        ]);
       });
     });
   });

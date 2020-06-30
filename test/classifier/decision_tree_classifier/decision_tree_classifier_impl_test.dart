@@ -1,3 +1,4 @@
+import 'package:ml_algo/ml_algo.dart';
 import 'package:ml_algo/src/classifier/decision_tree_classifier/decision_tree_classifier_impl.dart';
 import 'package:ml_algo/src/classifier/decision_tree_classifier/decision_tree_json_keys.dart';
 import 'package:ml_algo/src/tree_trainer/leaf_label/leaf_label.dart';
@@ -130,6 +131,15 @@ void main() {
       final classifier = DecisionTreeClassifierImpl.fromJson(classifier32Json);
       expect(classifier.targetColumnName, equals(targetColumnName));
       expect(classifier.treeRootNode, isNotNull);
+    });
+
+    test('should contain proper allowed metrics', () {
+      final classifier = DecisionTreeClassifierImpl.fromJson(classifier32Json);
+
+      expect(classifier.allowedMetrics, [
+        MetricType.accuracy,
+        MetricType.precision,
+      ]);
     });
   });
 }

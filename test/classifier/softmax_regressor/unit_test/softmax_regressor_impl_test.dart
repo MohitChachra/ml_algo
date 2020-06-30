@@ -1,4 +1,5 @@
 import 'package:ml_algo/src/classifier/softmax_regressor/softmax_regressor_impl.dart';
+import 'package:ml_algo/src/metric/metric_type.dart';
 import 'package:ml_dataframe/ml_dataframe.dart';
 import 'package:ml_linalg/dtype.dart';
 import 'package:ml_linalg/matrix.dart';
@@ -254,6 +255,15 @@ void main() {
 
       test('should persist cost per iteration list', () {
         expect(regressor.costPerIteration, costPerIteration);
+      });
+    });
+
+    group('LogisticRegressor.allowedMetrics', () {
+      test('should contain appropriate metrics', () {
+        expect(regressor.allowedMetrics, [
+          MetricType.accuracy,
+          MetricType.precision,
+        ]);
       });
     });
   });

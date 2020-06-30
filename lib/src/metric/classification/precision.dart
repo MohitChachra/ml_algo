@@ -1,16 +1,18 @@
 import 'package:ml_algo/src/metric/metric.dart';
 import 'package:ml_linalg/matrix.dart';
+import 'package:ml_linalg/vector.dart';
+import 'package:quiver/iterables.dart';
 
+/// TODO: add warning if predicted values are all zeroes
 class PrecisionMetric implements Metric {
   const PrecisionMetric();
 
   @override
+  /// Accepts [predictedLabels] and [origLabels] with entries with `1` as
+  /// positive label and `0` as negative one
   double getScore(Matrix predictedLabels, Matrix origLabels) {
-    // TODO: potential performance breach - maybe we don't need to map every row
-    // TODO: to a 1-0 vector?
     final allPredictedPositiveCounts = predictedLabels
-        .reduceRows((counts, row) => counts + row.mapToVector(
-            (count) => count > 0 ? 1 : 0));
+        .reduceRows((counts, row) => counts + row);
 
     // Let's say we have the following data:
     //
@@ -24,21 +26,41 @@ class PrecisionMetric implements Metric {
     //--------------------------------
     //
     // in order to count correctly predicted positive labels in matrix notation
-    // we may just subtract these two matrices-columns:
+    // we may multiple predicted labels by 2, and then subtract the two
+    // matrices from each other:
     //
-    // 1 - 1 =  0
-    // 1 - 0 =  1
-    // 0 - 1 = -1
-    // 0 - 0 =  0
-    // 1 - 1 =  0
+    // 1 - (1 * 2) = -1
+    // 1 - (0 * 2) =  1
+    // 0 - (1 * 2) = -2
+    // 0 - (0 * 2) =  0
+    // 1 - (1 * 2) = -1
     //
     // we see that matrices subtraction in case of original positive label and a
-    // correctly predicted one gives 0, thus we need to count zeroes in the
-    // resulting matrix
-    final correctPositiveCounts = (origLabels - predictedLabels)
+    // predicted positive label gives -1, thus we need to count number of elements
+    // with value equals -1 in the resulting matrix
+    final correctPositiveCounts = (origLabels - (predictedLabels * 2))
         .reduceRows((counts, row) => counts + row.mapToVector(
-            (diff) => diff == 0 ? 1 : 0));
+            (diff) => diff == -1 ? 1 : 0),
+        initValue: Vector.zero(origLabels.columnsNum, dtype: origLabels.dtype));
+    final aggregatedScore = (correctPositiveCounts / allPredictedPositiveCounts)
+        .mean();
 
-    return (correctPositiveCounts / allPredictedPositiveCounts).mean();
+    if (aggregatedScore.isFinite) {
+      return aggregatedScore;
+    }
+
+    return zip([
+      correctPositiveCounts,
+      allPredictedPositiveCounts,
+    ]).fold(0, (aggregated, pair) {
+      final correctPositiveCount = pair.first;
+      final allPredictedPositiveCount = pair.last;
+
+      if (allPredictedPositiveCount != 0) {
+        return aggregated + correctPositiveCount / allPredictedPositiveCount;
+      }
+
+      return aggregated + (correctPositiveCount == 0 ? 1 : 0);
+    });
   }
 }

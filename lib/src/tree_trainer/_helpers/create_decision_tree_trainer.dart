@@ -19,10 +19,8 @@ TreeTrainer createDecisionTreeTrainer(
   final targetIdx = enumerate(samples.header)
       .firstWhere((indexedName) => indexedName.value == targetName)
       .index;
-
   final featuresIndexedSeries = enumerate(samples.series)
       .where((indexed) => indexed.index != targetIdx);
-
   final featureIdxToUniqueValues = Map.fromEntries(
       featuresIndexedSeries
         .where((indexed) => indexed.value.isDiscrete)
@@ -34,12 +32,13 @@ TreeTrainer createDecisionTreeTrainer(
         ),
       ),
   );
-
-  final trainerFactory = dependencies.getDependency<TreeTrainerFactory>();
+  final trainerFactory = dependencies
+      .getDependency<TreeTrainerFactory>();
 
   return trainerFactory.createByType(
     TreeTrainerType.decision,
-    featuresIndexedSeries.map((indexed) => indexed.index),
+    featuresIndexedSeries
+        .map((indexed) => indexed.index),
     targetIdx,
     featureIdxToUniqueValues,
     minErrorOnNode,

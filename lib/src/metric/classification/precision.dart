@@ -1,3 +1,4 @@
+import 'package:ml_algo/src/helpers/normalize_class_labels.dart';
 import 'package:ml_algo/src/metric/metric.dart';
 import 'package:ml_linalg/matrix.dart';
 import 'package:ml_linalg/vector.dart';
@@ -38,10 +39,15 @@ class PrecisionMetric implements Metric {
     // we see that matrices subtraction in case of original positive label and a
     // predicted positive label gives -1, thus we need to count number of elements
     // with value equals -1 in the resulting matrix
-    final correctPositiveCounts = (origLabels - (predictedLabels * 2))
-        .reduceRows((counts, row) => counts + row.mapToVector(
-            (diff) => diff == -1 ? 1 : 0),
-        initValue: Vector.zero(origLabels.columnsNum, dtype: origLabels.dtype));
+    final difference = origLabels - (predictedLabels * 2);
+    final correctPositiveCounts = difference
+        .reduceRows(
+            (counts, row) => counts + row.mapToVector((diff) => diff == -1
+                ? 1 : 0),
+            initValue: Vector.zero(
+              origLabels.columnsNum,
+              dtype: origLabels.dtype,
+            ));
     final aggregatedScore = (correctPositiveCounts / allPredictedPositiveCounts)
         .mean();
 

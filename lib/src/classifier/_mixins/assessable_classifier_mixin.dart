@@ -1,4 +1,5 @@
 import 'package:ml_algo/src/common/exception/invalid_metric_type_exception.dart';
+import 'package:ml_algo/src/helpers/binarize_column_matrix.dart';
 import 'package:ml_algo/src/helpers/features_target_split.dart';
 import 'package:ml_algo/src/metric/factory.dart';
 import 'package:ml_algo/src/metric/metric_type.dart';
@@ -6,7 +7,7 @@ import 'package:ml_algo/src/model_selection/assessable.dart';
 import 'package:ml_algo/src/predictor/predictor.dart';
 import 'package:ml_dataframe/ml_dataframe.dart';
 
-mixin AssessablePredictorMixin implements
+mixin AssessableClassifierMixin implements
     Assessable,
     Predictor {
 
@@ -15,7 +16,7 @@ mixin AssessablePredictorMixin implements
       DataFrame samples,
       Iterable<String> targetNames,
       MetricType metricType,
-  ) {
+      ) {
     if (!allowedMetrics.contains(metricType)) {
       throw InvalidMetricTypeException(
           metricType, allowedMetrics);
@@ -32,7 +33,16 @@ mixin AssessablePredictorMixin implements
     final originalLabels = splits[1]
         .toMatrix(dtype);
 
-    return metric
-        .getScore(predictedLabels, originalLabels);
+    final processedPrediction = predictedLabels.columnsNum == 1
+        ? binarizeColumnMatrix(predictedLabels)
+        : predictedLabels;
+    final processedOriginal = originalLabels.columnsNum == 1
+        ? binarizeColumnMatrix(originalLabels)
+        : originalLabels;
+
+    return metric.getScore(
+        processedPrediction,
+        processedOriginal,
+    );
   }
 }

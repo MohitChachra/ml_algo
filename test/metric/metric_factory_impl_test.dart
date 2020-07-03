@@ -25,5 +25,9 @@ void main() {
     test('should create PrecisionMetric instance', () {
       expect(factory.createByType(MetricType.precision), isA<PrecisionMetric>());
     });
+
+    test('should throw an error if null is passed as metric type', () {
+      expect(() => factory.createByType(null), throwsUnsupportedError);
+    });
   });
 }

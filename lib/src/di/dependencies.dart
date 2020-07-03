@@ -30,6 +30,8 @@ import 'package:ml_algo/src/link_function/softmax/float32_softmax_link_function.
 import 'package:ml_algo/src/link_function/softmax/float64_softmax_link_function.dart';
 import 'package:ml_algo/src/math/randomizer/randomizer_factory.dart';
 import 'package:ml_algo/src/math/randomizer/randomizer_factory_impl.dart';
+import 'package:ml_algo/src/metric/metric_factory.dart';
+import 'package:ml_algo/src/metric/metric_factory_impl.dart';
 import 'package:ml_algo/src/model_selection/split_indices_provider/split_indices_provider_factory.dart';
 import 'package:ml_algo/src/model_selection/split_indices_provider/split_indices_provider_factory_impl.dart';
 import 'package:ml_algo/src/regressor/knn_regressor/knn_regressor_factory.dart';
@@ -53,6 +55,9 @@ import 'package:ml_algo/src/tree_trainer/tree_trainer_factory_impl.dart';
 
 Injector get dependencies =>
     injector ??= Injector()
+      ..registerSingleton<MetricFactory>(
+              (_) => const MetricFactoryImpl())
+
       ..registerSingleton<LinearOptimizerFactory>(
               (_) => const LinearOptimizerFactoryImpl())
 

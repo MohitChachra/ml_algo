@@ -1,6 +1,7 @@
 import 'package:ml_algo/src/common/exception/invalid_metric_type_exception.dart';
+import 'package:ml_algo/src/di/dependencies.dart';
 import 'package:ml_algo/src/helpers/features_target_split.dart';
-import 'package:ml_algo/src/metric/factory.dart';
+import 'package:ml_algo/src/metric/metric_factory.dart';
 import 'package:ml_algo/src/metric/metric_type.dart';
 import 'package:ml_algo/src/model_selection/assessable.dart';
 import 'package:ml_algo/src/predictor/predictor.dart';
@@ -25,7 +26,8 @@ mixin AssessablePredictorMixin implements
       samples,
       targetNames: targetNames,
     ).toList();
-    final metric = MetricFactory
+    final metric = dependencies
+        .getDependency<MetricFactory>()
         .createByType(metricType);
     final predictedLabels = predict(splits[0])
         .toMatrix(dtype);

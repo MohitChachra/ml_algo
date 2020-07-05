@@ -12,6 +12,7 @@ dependencies:
   json_serializable: ^3.3.0
   ml_dataframe: ^0.2.0
   ml_linalg: ^12.17.1
+  ml_preprocessing: ^5.1.2
   quiver: ^2.0.2
   xrange: ^0.0.8
 

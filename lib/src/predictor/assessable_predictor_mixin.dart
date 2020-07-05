@@ -14,7 +14,6 @@ mixin AssessablePredictorMixin implements
   @override
   double assess(
       DataFrame samples,
-      Iterable<String> targetNames,
       MetricType metricType,
   ) {
     if (!allowedMetrics.contains(metricType)) {
@@ -24,7 +23,7 @@ mixin AssessablePredictorMixin implements
 
     final splits = featuresTargetSplit(
       samples,
-      targetNames: targetNames,
+      targetNames: [],
     ).toList();
     final metric = dependencies
         .getDependency<MetricFactory>()

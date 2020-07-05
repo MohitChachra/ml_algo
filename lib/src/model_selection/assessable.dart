@@ -7,8 +7,7 @@ abstract class Assessable {
   ///
   /// Throws an exception if inappropriate [metricType] provided. All the
   /// appropriate metric types are in [allowedMetrics]
-  double assess(DataFrame observations, Iterable<String> targetNames,
-      MetricType metricType);
+  double assess(DataFrame observations, MetricType metricType);
 
   /// Returns metrics, applicable for the model
   List<MetricType> get allowedMetrics;

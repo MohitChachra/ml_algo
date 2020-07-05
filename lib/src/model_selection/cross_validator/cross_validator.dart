@@ -8,8 +8,7 @@ import 'package:ml_dataframe/ml_dataframe.dart';
 import 'package:ml_linalg/dtype.dart';
 import 'package:ml_linalg/linalg.dart';
 
-typedef PredictorFactory = Assessable Function(DataFrame observations,
-    Iterable<String> targetNames);
+typedef PredictorFactory = Assessable Function(DataFrame observations);
 
 typedef DataPreprocessFn = List<DataFrame> Function(DataFrame trainData,
     DataFrame testData);
@@ -26,14 +25,12 @@ abstract class CrossValidator {
   /// [samples] A dataset to be split into parts to iteratively evaluate given
   /// predictor's performance
   ///
-  /// [targetColumnNames] Names of columns from [samples] that contain outcomes
-  ///
   /// [numberOfFolds] Number of splits of the [samples]
   ///
   /// [dtype] A type for all the numerical data
   factory CrossValidator.kFold(
       DataFrame samples,
-      Iterable<String> targetColumnNames, {
+      {
         int numberOfFolds = 5,
         DType dtype = DType.float32,
       }) {
@@ -44,7 +41,6 @@ abstract class CrossValidator {
 
     return CrossValidatorImpl(
       samples,
-      targetColumnNames,
       dataSplitter,
       dtype,
     );
@@ -60,14 +56,11 @@ abstract class CrossValidator {
   /// [samples] A dataset to be split into parts to iteratively
   /// evaluate given predictor's performance
   ///
-  /// [targetColumnNames] Names of columns from [samples] that contain outcomes.
-  ///
   /// [p] Size of a split of [samples].
   ///
   /// [dtype] A type for all the numerical data.
   factory CrossValidator.lpo(
       DataFrame samples,
-      Iterable<String> targetColumnNames,
       int p, {
         DType dtype = DType.float32,
       }) {
@@ -78,7 +71,6 @@ abstract class CrossValidator {
 
     return CrossValidatorImpl(
       samples,
-      targetColumnNames,
       dataSplitter,
       dtype,
     );
@@ -116,7 +108,7 @@ abstract class CrossValidator {
   ///   header: header,
   ///   headerExists: false,
   /// );
-  /// final predictorFactory = (trainData, _) =>
+  /// final predictorFactory = (trainData) =>
   ///   KnnRegressor(trainData, 'col_3', k: 4);
   /// final onDataSplit = (trainData, testData) {
   ///   final standardizer = Standardizer(trainData);
@@ -125,7 +117,7 @@ abstract class CrossValidator {
   ///     standardizer.process(testData),
   ///   ];
   /// }
-  /// final validator = CrossValidator.kFold(data, ['col_3']);
+  /// final validator = CrossValidator.kFold(data);
   /// final scores = await validator.evaluate(
   ///   predictorFactory,
   ///   MetricType.mape,

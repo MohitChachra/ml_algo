@@ -26,23 +26,22 @@ void main() {
     final label1 = 100;
     final label2 = 300;
     final label3 = 200;
-    final sample1WithLabel = Vector.fromList([...sample1, label3]);
-    final sample2WithLabel = Vector.fromList([...sample2, label1]);
-    final sample3WithLabel = Vector.fromList([...sample3, label2]);
-    final originalBinarizedLabels = [
-      [0, 0, 1],
-      [1, 0, 0],
-      [0, 1, 0],
-    ];
+    final sample1WithLabel = Vector.fromList([...sample1, label1]);
+    final sample2WithLabel = Vector.fromList([...sample2, label2]);
+    final sample3WithLabel = Vector.fromList([...sample3, label3]);
     final predictedBinarizedLabels = [
+      [0, 0, 1],
+      [1, 0, 0],
+      [0, 1, 0],
+    ];
+    final originalBinarizedLabels = [
       [1, 0, 0],
       [0, 1, 0],
       [0, 0, 1],
     ];
-    final leafLabel1 = TreeLeafLabel(0, probability: 0.7);
-    final leafLabel2 = TreeLeafLabel(1, probability: 0.55);
-    final leafLabel3 = TreeLeafLabel(2, probability: 0.5);
-    final targetColumnName = 'class_name';
+    final learnedLeafLabel1 = TreeLeafLabel(label3, probability: 0.7);
+    final learnedLeafLabel2 = TreeLeafLabel(label1, probability: 0.55);
+    final learnedLeafLabel3 = TreeLeafLabel(label2, probability: 0.5);
     final features = Matrix.fromRows([
       sample1,
       sample2,
@@ -55,6 +54,7 @@ void main() {
     ]);
     final samples = DataFrame.fromMatrix(features);
     final labelledSamples = DataFrame.fromMatrix(labelledFeatures);
+    final targetColumnName = labelledSamples.header.last;
     final rootNodeJson = {
       childrenJsonKey: <Map<String, dynamic>>[],
     };
@@ -69,9 +69,9 @@ void main() {
       treeRootNodeJsonKey: rootNodeJson,
     };
     final treeRootMock = createRootNodeMock({
-      sample1: leafLabel1,
-      sample2: leafLabel2,
-      sample3: leafLabel3,
+      sample1: learnedLeafLabel1,
+      sample2: learnedLeafLabel2,
+      sample3: learnedLeafLabel3,
     }, rootNodeJson);
     final metricFactoryMock = MetricFactoryMock();
     final metricMock = MetricMock();
@@ -102,7 +102,8 @@ void main() {
     });
 
     tearDown(() {
-      resetMockitoState();
+      reset(metricFactoryMock);
+      reset(metricMock);
       injector.clearAll();
     });
 
@@ -126,9 +127,9 @@ void main() {
       expect(
           predictedLabels.toMatrix(),
           iterable2dAlmostEqualTo([
-            [leafLabel1.probability.toDouble()],
-            [leafLabel2.probability.toDouble()],
-            [leafLabel3.probability.toDouble()],
+            [learnedLeafLabel1.probability.toDouble()],
+            [learnedLeafLabel2.probability.toDouble()],
+            [learnedLeafLabel3.probability.toDouble()],
           ]),
       );
     });
@@ -174,10 +175,7 @@ void main() {
         'dtype=DType.float32', () {
       final metricType = MetricType.precision;
 
-      classifier32.assess(labelledSamples,
-        [labelledSamples.header.last],
-        metricType,
-      );
+      classifier32.assess(labelledSamples, metricType);
       verify(metricFactoryMock.createByType(metricType));
     });
 
@@ -185,36 +183,27 @@ void main() {
         'dtype=DType.float64', () {
       final metricType = MetricType.precision;
 
-      classifier64.assess(labelledSamples,
-        [labelledSamples.header.last],
-        metricType,
-      );
+      classifier64.assess(labelledSamples, metricType);
       verify(metricFactoryMock.createByType(metricType));
     });
 
     test('should calculate metric, dtype=DType.float32', () {
       final metricType = MetricType.precision;
 
-      classifier32.assess(labelledSamples,
-        [labelledSamples.header.last],
-        metricType,
-      );
+      classifier32.assess(labelledSamples, metricType);
       verify(metricMock.getScore(
-        argThat(equals(originalBinarizedLabels)),
         argThat(equals(predictedBinarizedLabels)),
+        argThat(equals(originalBinarizedLabels)),
       )).called(1);
     });
 
     test('should calculate metric, dtype=DType.float64', () {
       final metricType = MetricType.precision;
 
-      classifier64.assess(labelledSamples,
-        [labelledSamples.header.last],
-        metricType,
-      );
+      classifier64.assess(labelledSamples, metricType);
       verify(metricMock.getScore(
-        argThat(equals(originalBinarizedLabels)),
         argThat(equals(predictedBinarizedLabels)),
+        argThat(equals(originalBinarizedLabels)),
       )).called(1);
     });
   });

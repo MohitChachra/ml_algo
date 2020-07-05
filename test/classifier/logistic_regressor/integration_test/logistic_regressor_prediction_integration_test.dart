@@ -55,8 +55,7 @@ void main() {
         <num>[2.0, 4.0, 1.0, 1.0],
       ], header: ['first', 'second', 'third', 'target'], headerExists: false);
 
-      final score = classifier.assess(newSamples, ['target'],
-          MetricType.accuracy);
+      final score = classifier.assess(newSamples, MetricType.accuracy);
 
       expect(score, equals(0.0));
     });
@@ -66,8 +65,7 @@ void main() {
         <num>[2, 4, 1, 0],
       ], header: ['first', 'second', 'third', 'target'], headerExists: false);
 
-      final score = classifier.assess(newFeatures, ['target'],
-          MetricType.accuracy);
+      final score = classifier.assess(newFeatures, MetricType.accuracy);
 
       expect(score, equals(1.0));
     });

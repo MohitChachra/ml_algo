@@ -5,7 +5,6 @@ import 'package:ml_algo/src/classifier/decision_tree_classifier/decision_tree_js
 import 'package:ml_algo/src/common/exception/invalid_metric_type_exception.dart';
 import 'package:ml_algo/src/common/serializable/serializable_mixin.dart';
 import 'package:ml_algo/src/di/dependencies.dart';
-import 'package:ml_algo/src/helpers/binarize_column_matrix.dart';
 import 'package:ml_algo/src/helpers/features_target_split.dart';
 import 'package:ml_algo/src/metric/metric_factory.dart';
 import 'package:ml_algo/src/metric/metric_type.dart';
@@ -19,6 +18,7 @@ import 'package:ml_linalg/dtype_to_json.dart';
 import 'package:ml_linalg/from_dtype_json.dart';
 import 'package:ml_linalg/matrix.dart';
 import 'package:ml_linalg/vector.dart';
+import 'package:ml_preprocessing/ml_preprocessing.dart';
 
 part 'decision_tree_classifier_impl.g.dart';
 
@@ -78,9 +78,7 @@ class DecisionTreeClassifierImpl
 
     return DataFrame.fromMatrix(
       Matrix.fromColumns([outcomeVector], dtype: dtype),
-      header: [
-        targetColumnName,
-      ],
+      header: [targetColumnName],
     );
   }
 
@@ -103,16 +101,13 @@ class DecisionTreeClassifierImpl
 
     return DataFrame.fromMatrix(
       probabilitiesMatrixColumn,
-      header: [
-        targetColumnName,
-      ],
+      header: [targetColumnName],
     );
   }
 
   @override
   double assess(
     DataFrame samples,
-    Iterable<String> targetNames,
     MetricType metricType,
   ) {
     if (!allowedMetrics.contains(metricType)) {
@@ -122,21 +117,25 @@ class DecisionTreeClassifierImpl
 
     final splits = featuresTargetSplit(
       samples,
-      targetNames: targetNames,
+      targetNames: [targetColumnName],
     ).toList();
     final metric = dependencies
         .getDependency<MetricFactory>()
         .createByType(metricType);
-    final predictedLabels = predict(splits[0])
+    final labelEncoder = Encoder.oneHot(
+      splits[1],
+      featureNames: splits[1].header,
+    );
+    final predictedLabels = labelEncoder
+        .process(predict(splits[0]))
         .toMatrix(dtype);
-    final originalLabels = splits[1]
+    final originalLabels = labelEncoder
+        .process(splits[1])
         .toMatrix(dtype);
-    final binarizedOriginal = binarizeColumnMatrix(originalLabels);
-    final binarizedPrediction = binarizeColumnMatrix(predictedLabels);
 
     return metric.getScore(
-      binarizedPrediction,
-      binarizedOriginal,
+      predictedLabels,
+      originalLabels,
     );
   }
 

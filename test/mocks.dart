@@ -22,6 +22,8 @@ import 'package:ml_algo/src/linear_optimizer/linear_optimizer_factory.dart';
 import 'package:ml_algo/src/link_function/link_function.dart';
 import 'package:ml_algo/src/math/randomizer/randomizer.dart';
 import 'package:ml_algo/src/math/randomizer/randomizer_factory.dart';
+import 'package:ml_algo/src/metric/metric.dart';
+import 'package:ml_algo/src/metric/metric_factory.dart';
 import 'package:ml_algo/src/model_selection/assessable.dart';
 import 'package:ml_algo/src/model_selection/split_indices_provider/split_indices_provider.dart';
 import 'package:ml_algo/src/model_selection/split_indices_provider/split_indices_provider_factory.dart';
@@ -45,6 +47,10 @@ import 'package:ml_algo/src/tree_trainer/splitter/splitter_factory.dart';
 import 'package:ml_algo/src/tree_trainer/tree_node/tree_node.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
+
+class MetricFactoryMock extends Mock implements MetricFactory {}
+
+class MetricMock extends Mock implements Metric {}
 
 class RandomizerFactoryMock extends Mock implements RandomizerFactory {}
 

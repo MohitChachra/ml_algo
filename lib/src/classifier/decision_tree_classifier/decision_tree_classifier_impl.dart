@@ -131,8 +131,8 @@ class DecisionTreeClassifierImpl
         .toMatrix(dtype);
     final originalLabels = splits[1]
         .toMatrix(dtype);
-    final binarizedPrediction = binarizeColumnMatrix(predictedLabels);
     final binarizedOriginal = binarizeColumnMatrix(originalLabels);
+    final binarizedPrediction = binarizeColumnMatrix(predictedLabels);
 
     return metric.getScore(
       binarizedPrediction,

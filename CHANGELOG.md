@@ -1,6 +1,9 @@
 # Changelog
 
-## 14.3.0
+## 15.0.0
+- Breaking change:
+    - `CrossValidator`: `targetNames` argument removed
+    - `Assessable`, `assess` method: `targetNames` argument removed
 - Precision metric added
 
 ## 14.2.2

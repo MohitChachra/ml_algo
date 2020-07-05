@@ -53,6 +53,9 @@ class DecisionTreeClassifierImpl
   @JsonKey(name: targetColumnNameJsonKey)
   final String targetColumnName;
 
+  @override
+  Iterable<String> get targetNames => [targetColumnName];
+
   @JsonKey(
     name: treeRootNodeJsonKey,
     toJson: treeNodeToJson,
@@ -78,7 +81,7 @@ class DecisionTreeClassifierImpl
 
     return DataFrame.fromMatrix(
       Matrix.fromColumns([outcomeVector], dtype: dtype),
-      header: [targetColumnName],
+      header: targetNames,
     );
   }
 
@@ -101,7 +104,7 @@ class DecisionTreeClassifierImpl
 
     return DataFrame.fromMatrix(
       probabilitiesMatrixColumn,
-      header: [targetColumnName],
+      header: targetNames,
     );
   }
 

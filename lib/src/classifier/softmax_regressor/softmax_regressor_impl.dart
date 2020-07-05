@@ -56,6 +56,7 @@ class SoftmaxRegressorImpl
   Map<String, dynamic> toJson() => _$SoftmaxRegressorImplToJson(this);
 
   @override
+  @deprecated
   @JsonKey(name: softmaxRegressorClassNamesJsonKey)
   final Iterable<String> classNames;
 
@@ -105,6 +106,9 @@ class SoftmaxRegressorImpl
   final List<num> costPerIteration;
 
   @override
+  Iterable<String> get targetNames => classNames;
+
+  @override
   DataFrame predict(DataFrame testFeatures) {
     final allProbabilities = getProbabilitiesMatrix(testFeatures);
     final labels = allProbabilities.mapRows((probabilities) {
@@ -123,7 +127,7 @@ class SoftmaxRegressorImpl
 
     return DataFrame.fromMatrix(
       labels,
-      header: classNames,
+      header: targetNames,
     );
   }
 }

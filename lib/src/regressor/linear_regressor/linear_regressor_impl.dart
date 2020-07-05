@@ -75,6 +75,9 @@ class LinearRegressorImpl
   final DType dtype;
 
   @override
+  Iterable<String> get targetNames => [targetName];
+
+  @override
   DataFrame predict(DataFrame features) {
     final prediction = addInterceptIf(
       fitIntercept,
@@ -85,7 +88,7 @@ class LinearRegressorImpl
 
     return DataFrame.fromMatrix(
         prediction,
-        header: [targetName],
+        header: targetNames,
     );
   }
 }

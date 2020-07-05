@@ -25,6 +25,9 @@ class KnnRegressorImpl
   @override
   final DType dtype;
 
+  @override
+  Iterable<String> get targetNames => [_targetName];
+
   final String _targetName;
   final KnnSolver _solver;
   final Kernel _kernel;
@@ -52,14 +55,17 @@ class KnnRegressorImpl
     final neighbours = _solver.findKNeighbours(features);
 
     return neighbours.map((kNeighbours) {
-      final weightedLabels = kNeighbours.fold<Vector>(_zeroVector, (weightedSum, neighbour) {
+      final weightedLabels = kNeighbours.fold<Vector>(_zeroVector,
+              (weightedSum, neighbour) {
         final weight = _kernel.getWeightByDistance(neighbour.distance);
         final weightedLabel = neighbour.label * weight;
+
         return weightedSum + weightedLabel;
       });
 
       final weightsSum = kNeighbours.fold<num>(0,
-              (sum, neighbour) => sum + _kernel.getWeightByDistance(neighbour.distance));
+              (sum, neighbour) => sum + _kernel
+                  .getWeightByDistance(neighbour.distance));
 
       return weightedLabels / weightsSum;
     });

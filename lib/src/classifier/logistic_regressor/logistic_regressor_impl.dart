@@ -74,6 +74,7 @@ class LogisticRegressorImpl
   final Matrix coefficientsByClasses;
 
   @override
+  @deprecated
   @JsonKey(name: logisticRegressorClassNamesJsonKey)
   final Iterable<String> classNames;
 
@@ -118,6 +119,9 @@ class LogisticRegressorImpl
   final List<num> costPerIteration;
 
   @override
+  Iterable<String> get targetNames => classNames;
+
+  @override
   DataFrame predict(DataFrame testFeatures) {
     final predictedLabels = getProbabilitiesMatrix(testFeatures)
         .mapColumns(
@@ -130,7 +134,7 @@ class LogisticRegressorImpl
 
     return DataFrame.fromMatrix(
       predictedLabels,
-      header: classNames,
+      header: targetNames,
     );
   }
 }

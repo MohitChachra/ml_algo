@@ -32,6 +32,9 @@ class KnnClassifierImpl
   @override
   final DType dtype;
 
+  @override
+  Iterable<String> get targetNames => [_targetColumnName];
+
   final List<num> _classLabels;
   final Kernel _kernel;
   final KnnSolver _solver;

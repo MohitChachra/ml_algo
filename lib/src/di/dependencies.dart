@@ -9,6 +9,7 @@ import 'package:ml_algo/src/common/sequence_elements_distribution_calculator/dis
 import 'package:ml_algo/src/common/sequence_elements_distribution_calculator/distribution_calculator_factory_impl.dart';
 import 'package:ml_algo/src/cost_function/cost_function_factory.dart';
 import 'package:ml_algo/src/cost_function/cost_function_factory_impl.dart';
+import 'package:ml_algo/src/di/dependency_keys.dart';
 import 'package:ml_algo/src/di/injector.dart';
 import 'package:ml_algo/src/knn_kernel/kernel_factory.dart';
 import 'package:ml_algo/src/knn_kernel/kernel_factory_impl.dart';
@@ -52,11 +53,20 @@ import 'package:ml_algo/src/tree_trainer/splitter/splitter_factory.dart';
 import 'package:ml_algo/src/tree_trainer/splitter/splitter_factory_impl.dart';
 import 'package:ml_algo/src/tree_trainer/tree_trainer_factory.dart';
 import 'package:ml_algo/src/tree_trainer/tree_trainer_factory_impl.dart';
+import 'package:ml_dataframe/ml_dataframe.dart';
+import 'package:ml_preprocessing/ml_preprocessing.dart';
+
+typedef EncoderFactory = Encoder Function(DataFrame, Iterable<String>);
 
 Injector get dependencies =>
     injector ??= Injector()
       ..registerSingleton<MetricFactory>(
               (_) => const MetricFactoryImpl())
+
+      ..registerDependency<EncoderFactory>(
+              (_) => (DataFrame data, Iterable<String> targetNames) =>
+                  Encoder.oneHot(data, featureNames: targetNames),
+          dependencyName: oneHotEncoderFactoryKey)
 
       ..registerSingleton<LinearOptimizerFactory>(
               (_) => const LinearOptimizerFactoryImpl())

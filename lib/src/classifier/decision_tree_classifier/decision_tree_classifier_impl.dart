@@ -5,6 +5,7 @@ import 'package:ml_algo/src/classifier/decision_tree_classifier/decision_tree_js
 import 'package:ml_algo/src/common/exception/invalid_metric_type_exception.dart';
 import 'package:ml_algo/src/common/serializable/serializable_mixin.dart';
 import 'package:ml_algo/src/di/dependencies.dart';
+import 'package:ml_algo/src/di/dependency_keys.dart';
 import 'package:ml_algo/src/helpers/features_target_split.dart';
 import 'package:ml_algo/src/metric/metric_factory.dart';
 import 'package:ml_algo/src/metric/metric_type.dart';
@@ -18,7 +19,6 @@ import 'package:ml_linalg/dtype_to_json.dart';
 import 'package:ml_linalg/from_dtype_json.dart';
 import 'package:ml_linalg/matrix.dart';
 import 'package:ml_linalg/vector.dart';
-import 'package:ml_preprocessing/ml_preprocessing.dart';
 
 part 'decision_tree_classifier_impl.g.dart';
 
@@ -122,18 +122,21 @@ class DecisionTreeClassifierImpl
       samples,
       targetNames: [targetColumnName],
     ).toList();
-    final metric = dependencies
-        .getDependency<MetricFactory>()
+    final featuresFrame = splits[0];
+    final originalLabelsFrame = splits[1];
+    final metric = dependencies.getDependency<MetricFactory>()
         .createByType(metricType);
-    final labelEncoder = Encoder.oneHot(
-      splits[1],
-      featureNames: splits[1].header,
+    final encoderFactory = dependencies.getDependency<EncoderFactory>(
+        dependencyName: oneHotEncoderFactoryKey);
+    final labelEncoder = encoderFactory(
+        originalLabelsFrame,
+        originalLabelsFrame.header
     );
     final predictedLabels = labelEncoder
-        .process(predict(splits[0]))
+        .process(predict(featuresFrame))
         .toMatrix(dtype);
     final originalLabels = labelEncoder
-        .process(splits[1])
+        .process(originalLabelsFrame)
         .toMatrix(dtype);
 
     return metric.getScore(

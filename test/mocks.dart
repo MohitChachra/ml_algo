@@ -45,12 +45,20 @@ import 'package:ml_algo/src/tree_trainer/splitter/numerical_splitter/numerical_s
 import 'package:ml_algo/src/tree_trainer/splitter/splitter.dart';
 import 'package:ml_algo/src/tree_trainer/splitter/splitter_factory.dart';
 import 'package:ml_algo/src/tree_trainer/tree_node/tree_node.dart';
+import 'package:ml_dataframe/ml_dataframe.dart';
+import 'package:ml_preprocessing/ml_preprocessing.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
 class MetricFactoryMock extends Mock implements MetricFactory {}
 
 class MetricMock extends Mock implements Metric {}
+
+class EncoderFactoryMock extends Mock {
+  Encoder create(DataFrame data, Iterable<String> targetNames);
+}
+
+class EncoderMock extends Mock implements Encoder {}
 
 class RandomizerFactoryMock extends Mock implements RandomizerFactory {}
 

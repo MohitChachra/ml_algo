@@ -2,6 +2,8 @@ import 'package:injector/injector.dart';
 import 'package:ml_algo/ml_algo.dart';
 import 'package:ml_algo/src/classifier/decision_tree_classifier/decision_tree_classifier_impl.dart';
 import 'package:ml_algo/src/classifier/decision_tree_classifier/decision_tree_json_keys.dart';
+import 'package:ml_algo/src/di/dependencies.dart';
+import 'package:ml_algo/src/di/dependency_keys.dart';
 import 'package:ml_algo/src/di/injector.dart';
 import 'package:ml_algo/src/metric/metric_factory.dart';
 import 'package:ml_algo/src/tree_trainer/leaf_label/leaf_label.dart';
@@ -52,9 +54,23 @@ void main() {
       sample2WithLabel,
       sample3WithLabel,
     ]);
-    final samples = DataFrame.fromMatrix(features);
-    final labelledSamples = DataFrame.fromMatrix(labelledFeatures);
-    final targetColumnName = labelledSamples.header.last;
+    final unlabelledFeaturesFrame = DataFrame.fromMatrix(features);
+    final labelledFeaturesFrame = DataFrame.fromMatrix(labelledFeatures);
+    final targetColumnName = labelledFeaturesFrame.header.last;
+    final predictedLabelsFrame = DataFrame([
+      <dynamic>[label3],
+      <dynamic>[label1],
+      <dynamic>[label2],
+    ], headerExists: false, header: [targetColumnName]);
+    final originalLabelsFrame = DataFrame([
+      <dynamic>[label1],
+      <dynamic>[label2],
+      <dynamic>[label3],
+    ], headerExists: false, header: [targetColumnName]);
+    final predictedBinarizedLabelsFrame = DataFrame(predictedBinarizedLabels,
+        headerExists: false, header: [targetColumnName]);
+    final originalBinarizedLabelsFrame = DataFrame(originalBinarizedLabels,
+        headerExists: false, header: [targetColumnName]);
     final rootNodeJson = {
       childrenJsonKey: <Map<String, dynamic>>[],
     };
@@ -75,6 +91,13 @@ void main() {
     }, rootNodeJson);
     final metricFactoryMock = MetricFactoryMock();
     final metricMock = MetricMock();
+    final encoderFactoryMock = EncoderFactoryMock();
+    final encoderMock = EncoderMock();
+    final encodedLabelsFrames = [
+      predictedBinarizedLabelsFrame,
+      originalBinarizedLabelsFrame,
+    ];
+    var encoderCallIteration = 0;
 
     DecisionTreeClassifierImpl classifier32;
     DecisionTreeClassifierImpl classifier64;
@@ -84,9 +107,15 @@ void main() {
 
       when(metricFactoryMock.createByType(argThat(isA<MetricType>())))
           .thenReturn(metricMock);
+      when(encoderFactoryMock.create(any, any)).thenReturn(encoderMock);
+      when(encoderMock.process(any)).thenAnswer(
+              (_) => encodedLabelsFrames[encoderCallIteration++]);
 
       injector
-          .registerSingleton<MetricFactory>((_) => metricFactoryMock);
+          ..registerDependency<EncoderFactory>(
+                  (_) => encoderFactoryMock.create,
+              dependencyName: oneHotEncoderFactoryKey)
+          ..registerSingleton<MetricFactory>((_) => metricFactoryMock);
 
       classifier32 = DecisionTreeClassifierImpl(
         treeRootMock,
@@ -104,7 +133,22 @@ void main() {
     tearDown(() {
       reset(metricFactoryMock);
       reset(metricMock);
+      reset(encoderFactoryMock);
+      reset(encoderMock);
       injector.clearAll();
+      encoderCallIteration = 0;
+    });
+
+    test('should predict labels for passed unlabelled features dataframe', () {
+      final actual = classifier32.predict(unlabelledFeaturesFrame);
+
+      expect(actual.toMatrix(), predictedLabelsFrame.toMatrix());
+    });
+
+    test('should return predicted labels with a proper header', () {
+      final actual = classifier32.predict(unlabelledFeaturesFrame);
+
+      expect(actual.header, classifier32.targetNames);
     });
 
     test('should return data frame with empty header if input matrix is '
@@ -122,7 +166,7 @@ void main() {
     });
 
     test('should return data frame with probabilities for each class label', () {
-      final predictedLabels = classifier32.predictProbabilities(samples);
+      final predictedLabels = classifier32.predictProbabilities(unlabelledFeaturesFrame);
 
       expect(
           predictedLabels.toMatrix(),
@@ -175,36 +219,100 @@ void main() {
         'dtype=DType.float32', () {
       final metricType = MetricType.precision;
 
-      classifier32.assess(labelledSamples, metricType);
-      verify(metricFactoryMock.createByType(metricType));
+      classifier32.assess(labelledFeaturesFrame, metricType);
+      verify(metricFactoryMock.createByType(metricType)).called(1);
     });
 
-    test('should call metric factory while assessing a model, '
-        'dtype=DType.float64', () {
+    test('should call encoder factory while assessing a model, '
+        'dtype=DType.float32', () {
       final metricType = MetricType.precision;
 
-      classifier64.assess(labelledSamples, metricType);
-      verify(metricFactoryMock.createByType(metricType));
+      classifier32.assess(labelledFeaturesFrame, metricType);
+
+      final verificationResult = verify(
+          encoderFactoryMock.create(captureAny, [targetColumnName]))
+        ..called(1);
+      final actualFrame = verificationResult.captured[0] as DataFrame;
+
+      expect(
+        actualFrame.toMatrix(),
+        originalLabelsFrame.toMatrix(),
+      );
+    });
+
+    test('should encode predicted labels while assessing a model, '
+        'dtype=DType.float32', () {
+      final metricType = MetricType.precision;
+
+      classifier32.assess(labelledFeaturesFrame, metricType);
+
+      final verificationResult = verify(encoderMock.process(captureAny));
+      final actualProcessingFrame = verificationResult.captured[0] as DataFrame;
+
+      expect(
+        actualProcessingFrame.toMatrix(),
+        predictedLabelsFrame.toMatrix(),
+      );
+    });
+
+    test('should preserve dataframe header while encoding predicted labels '
+        'during a model assessment, dtype=DType.float32', () {
+      final metricType = MetricType.precision;
+
+      classifier32.assess(labelledFeaturesFrame, metricType);
+
+      final verificationResult = verify(encoderMock.process(captureAny));
+      final actualProcessingFrame = verificationResult.captured[0] as DataFrame;
+
+      expect(actualProcessingFrame.header, classifier32.targetNames);
+    });
+
+    test('should encode original labels while assessing a model, '
+        'dtype=DType.float32', () {
+      final metricType = MetricType.precision;
+
+      classifier32.assess(labelledFeaturesFrame, metricType);
+
+      final verificationResult = verify(encoderMock.process(captureAny));
+      final actualProcessingFrame = verificationResult.captured[1] as DataFrame;
+
+      expect(
+        actualProcessingFrame.toMatrix(),
+        originalLabelsFrame.toMatrix(),
+      );
+    });
+
+    test('should preserve dataframe header while encoding original labels '
+        'during a model assessment, dtype=DType.float32', () {
+      final metricType = MetricType.precision;
+
+      classifier32.assess(labelledFeaturesFrame, metricType);
+
+      final verificationResult = verify(encoderMock.process(captureAny));
+      final actualProcessingFrame = verificationResult.captured[1] as DataFrame;
+
+      expect(actualProcessingFrame.header, classifier32.targetNames);
     });
 
     test('should calculate metric, dtype=DType.float32', () {
       final metricType = MetricType.precision;
 
-      classifier32.assess(labelledSamples, metricType);
+      classifier32.assess(labelledFeaturesFrame, metricType);
       verify(metricMock.getScore(
         argThat(equals(predictedBinarizedLabels)),
         argThat(equals(originalBinarizedLabels)),
       )).called(1);
     });
 
-    test('should calculate metric, dtype=DType.float64', () {
-      final metricType = MetricType.precision;
+    test('should return performance score, dtype=DType.float32', () {
+      final score = 0.75;
 
-      classifier64.assess(labelledSamples, metricType);
-      verify(metricMock.getScore(
-        argThat(equals(predictedBinarizedLabels)),
-        argThat(equals(originalBinarizedLabels)),
-      )).called(1);
+      when(metricMock.getScore(any, any)).thenReturn(score);
+
+      final metricType = MetricType.precision;
+      final actualScore = classifier32.assess(labelledFeaturesFrame, metricType);
+
+      expect(actualScore, score);
     });
   });
 }

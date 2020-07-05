@@ -23,7 +23,7 @@ mixin AssessablePredictorMixin implements
 
     final splits = featuresTargetSplit(
       samples,
-      targetNames: [],
+      targetNames: targetNames,
     ).toList();
     final metric = dependencies
         .getDependency<MetricFactory>()

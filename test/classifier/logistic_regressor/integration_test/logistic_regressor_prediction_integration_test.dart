@@ -53,7 +53,7 @@ void main() {
     test('should evaluate prediction quality, accuracy = 0', () {
       final newSamples = DataFrame([
         <num>[2.0, 4.0, 1.0, 1.0],
-      ], header: ['first', 'second', 'third', 'target'], headerExists: false);
+      ], headerExists: false);
 
       final score = classifier.assess(newSamples, MetricType.accuracy);
 
@@ -63,7 +63,7 @@ void main() {
     test('should evaluate prediction quality, accuracy = 1', () {
       final newFeatures = DataFrame([
         <num>[2, 4, 1, 0],
-      ], header: ['first', 'second', 'third', 'target'], headerExists: false);
+      ], headerExists: false);
 
       final score = classifier.assess(newFeatures, MetricType.accuracy);
 

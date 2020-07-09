@@ -97,9 +97,11 @@ class LogisticRegressorImpl
   @JsonKey(name: logisticRegressorProbabilityThresholdJsonKey)
   final num probabilityThreshold;
 
+  @override
   @JsonKey(name: logisticRegressorPositiveLabelJsonKey)
   final num positiveLabel;
 
+  @override
   @JsonKey(name: logisticRegressorNegativeLabelJsonKey)
   final num negativeLabel;
 

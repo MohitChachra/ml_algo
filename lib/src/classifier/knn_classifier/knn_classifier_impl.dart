@@ -1,10 +1,16 @@
 import 'package:ml_algo/src/classifier/_mixins/classification_metrics_mixin.dart';
 import 'package:ml_algo/src/classifier/knn_classifier/knn_classifier.dart';
+import 'package:ml_algo/src/common/exception/invalid_metric_type_exception.dart';
+import 'package:ml_algo/src/di/dependencies.dart';
+import 'package:ml_algo/src/di/dependency_keys.dart';
+import 'package:ml_algo/src/helpers/features_target_split.dart';
 import 'package:ml_algo/src/helpers/validate_class_label_list.dart';
 import 'package:ml_algo/src/helpers/validate_test_features.dart';
 import 'package:ml_algo/src/knn_kernel/kernel.dart';
 import 'package:ml_algo/src/knn_solver/knn_solver.dart';
 import 'package:ml_algo/src/knn_solver/neigbour.dart';
+import 'package:ml_algo/src/metric/metric_factory.dart';
+import 'package:ml_algo/src/metric/metric_type.dart';
 import 'package:ml_algo/src/predictor/assessable_predictor_mixin.dart';
 import 'package:ml_dataframe/ml_dataframe.dart';
 import 'package:ml_linalg/dtype.dart';
@@ -13,7 +19,6 @@ import 'package:ml_linalg/vector.dart';
 
 class KnnClassifierImpl
     with
-        AssessablePredictorMixin,
         ClassificationMetricsMixin
     implements
         KnnClassifier {
@@ -41,6 +46,12 @@ class KnnClassifierImpl
   final String _columnPrefix = 'Class label';
 
   @override
+  final num positiveLabel = null;
+
+  @override
+  final num negativeLabel = null;
+
+  @override
   DataFrame predict(DataFrame features) {
     validateTestFeatures(features, dtype);
 
@@ -55,7 +66,7 @@ class KnnClassifierImpl
 
     return DataFrame.fromMatrix(
       Matrix.fromColumns([outcomesAsVector], dtype: dtype),
-      header: [_targetColumnName],
+      header: targetNames,
     );
   }
 
@@ -69,6 +80,43 @@ class KnnClassifierImpl
         .map((label) => '${_columnPrefix} ${label.toString()}');
 
     return DataFrame.fromMatrix(probabilityMatrix, header: header);
+  }
+
+  @override
+  double assess(
+      DataFrame samples,
+      MetricType metricType,
+      ) {
+    if (!allowedMetrics.contains(metricType)) {
+      throw InvalidMetricTypeException(
+          metricType, allowedMetrics);
+    }
+
+    final splits = featuresTargetSplit(
+      samples,
+      targetNames: targetNames,
+    ).toList();
+    final featuresFrame = splits[0];
+    final originalLabelsFrame = splits[1];
+    final metric = dependencies.getDependency<MetricFactory>()
+        .createByType(metricType);
+    final encoderFactory = dependencies.getDependency<EncoderFactory>(
+        dependencyName: oneHotEncoderFactoryKey);
+    final labelEncoder = encoderFactory(
+        originalLabelsFrame,
+        originalLabelsFrame.header
+    );
+    final predictedLabels = labelEncoder
+        .process(predict(featuresFrame))
+        .toMatrix(dtype);
+    final originalLabels = labelEncoder
+        .process(originalLabelsFrame)
+        .toMatrix(dtype);
+
+    return metric.getScore(
+      predictedLabels,
+      originalLabels,
+    );
   }
 
   /// Returns a map of the following format:

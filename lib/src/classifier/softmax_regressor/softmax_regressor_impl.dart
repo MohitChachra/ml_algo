@@ -92,9 +92,11 @@ class SoftmaxRegressorImpl
   )
   final LinkFunction linkFunction;
 
+  @override
   @JsonKey(name: softmaxRegressorPositiveLabelJsonKey)
   final num positiveLabel;
 
+  @override
   @JsonKey(name: softmaxRegressorNegativeLabelJsonKey)
   final num negativeLabel;
 

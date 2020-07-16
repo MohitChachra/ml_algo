@@ -2,7 +2,7 @@ import 'package:ml_algo/ml_algo.dart';
 import 'package:ml_algo/src/classifier/classifier.dart';
 import 'package:ml_algo/src/common/exception/invalid_metric_type_exception.dart';
 import 'package:ml_algo/src/di/dependencies.dart';
-import 'package:ml_algo/src/helpers/features_target_split.dart';
+import 'package:ml_algo/src/helpers/features_target_split_interface.dart';
 import 'package:ml_algo/src/helpers/normalize_class_labels.dart';
 import 'package:ml_algo/src/metric/metric_factory.dart';
 import 'package:ml_algo/src/metric/metric_type.dart';
@@ -13,6 +13,7 @@ class ClassifierAssessorImpl implements ModelAssessor<Classifier> {
   ClassifierAssessorImpl(
       this._metricFactory,
       this._encoderFactory,
+      this._featuresTargetSplit,
   );
 
   static const List<MetricType> _allowedMetricTypes = [
@@ -22,6 +23,7 @@ class ClassifierAssessorImpl implements ModelAssessor<Classifier> {
 
   final MetricFactory _metricFactory;
   final EncoderFactory _encoderFactory;
+  final FeaturesTargetSplit _featuresTargetSplit;
 
   @override
   double assess(
@@ -35,7 +37,7 @@ class ClassifierAssessorImpl implements ModelAssessor<Classifier> {
           metricType, _allowedMetricTypes);
     }
 
-    final splits = featuresTargetSplit(
+    final splits = _featuresTargetSplit(
       samples,
       targetNames: classifier.targetNames,
     ).toList();

@@ -1,3 +1,4 @@
+import 'package:ml_algo/src/classifier/classifier.dart';
 import 'package:ml_algo/src/classifier/knn_classifier/knn_classifier.dart';
 import 'package:ml_algo/src/classifier/knn_classifier/knn_classifier_factory.dart';
 import 'package:ml_algo/src/classifier/logistic_regressor/logistic_regressor.dart';
@@ -7,6 +8,7 @@ import 'package:ml_algo/src/common/sequence_elements_distribution_calculator/dis
 import 'package:ml_algo/src/common/sequence_elements_distribution_calculator/distribution_calculator_factory.dart';
 import 'package:ml_algo/src/cost_function/cost_function.dart';
 import 'package:ml_algo/src/cost_function/cost_function_factory.dart';
+import 'package:ml_algo/src/helpers/features_target_split_interface.dart';
 import 'package:ml_algo/src/knn_kernel/kernel.dart';
 import 'package:ml_algo/src/knn_kernel/kernel_factory.dart';
 import 'package:ml_algo/src/knn_solver/knn_solver.dart';
@@ -56,6 +58,13 @@ class MetricMock extends Mock implements Metric {}
 
 class EncoderFactoryMock extends Mock {
   Encoder create(DataFrame data, Iterable<String> targetNames);
+}
+
+class FeatureTargetSplitterMock extends Mock {
+  Iterable<DataFrame> split(DataFrame samples, {
+    Iterable<String> targetNames,
+    Iterable<int> targetIndices,
+  });
 }
 
 class EncoderMock extends Mock implements Encoder {}
@@ -164,6 +173,8 @@ class SoftmaxRegressorMock extends Mock implements SoftmaxRegressor {}
 
 class SoftmaxRegressorFactoryMock extends Mock implements
     SoftmaxRegressorFactory {}
+
+class ClassifierMock extends Mock implements Classifier {}
 
 LearningRateGeneratorFactoryMock createLearningRateGeneratorFactoryMock(
     LearningRateGenerator generator) {

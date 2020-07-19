@@ -48,6 +48,7 @@ import 'package:ml_algo/src/tree_trainer/splitter/splitter.dart';
 import 'package:ml_algo/src/tree_trainer/splitter/splitter_factory.dart';
 import 'package:ml_algo/src/tree_trainer/tree_node/tree_node.dart';
 import 'package:ml_dataframe/ml_dataframe.dart';
+import 'package:ml_linalg/matrix.dart';
 import 'package:ml_preprocessing/ml_preprocessing.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
@@ -65,6 +66,10 @@ class FeatureTargetSplitterMock extends Mock {
     Iterable<String> targetNames,
     Iterable<int> targetIndices,
   });
+}
+
+class ClassLabelsNormalizerMock extends Mock {
+  Matrix normalize(Matrix classLabels, num positiveLabel, num negativeLabel);
 }
 
 class EncoderMock extends Mock implements Encoder {}

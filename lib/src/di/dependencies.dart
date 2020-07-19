@@ -13,6 +13,8 @@ import 'package:ml_algo/src/di/dependency_keys.dart';
 import 'package:ml_algo/src/di/injector.dart';
 import 'package:ml_algo/src/helpers/features_target_split.dart';
 import 'package:ml_algo/src/helpers/features_target_split_interface.dart';
+import 'package:ml_algo/src/helpers/normalize_class_labels.dart';
+import 'package:ml_algo/src/helpers/normalize_class_labels_interface.dart';
 import 'package:ml_algo/src/knn_kernel/kernel_factory.dart';
 import 'package:ml_algo/src/knn_kernel/kernel_factory_impl.dart';
 import 'package:ml_algo/src/knn_solver/knn_solver_factory.dart';
@@ -72,6 +74,8 @@ Injector get dependencies =>
       
       ..registerDependency<FeaturesTargetSplit>(
               (_) => featuresTargetSplit)
+
+      ..registerDependency<NormalizeClassLabels>((_) => normalizeClassLabels)
 
       ..registerSingleton<LinearOptimizerFactory>(
               (_) => const LinearOptimizerFactoryImpl())

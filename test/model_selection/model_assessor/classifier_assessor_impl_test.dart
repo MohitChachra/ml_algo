@@ -5,11 +5,13 @@ import 'package:ml_dataframe/ml_dataframe.dart';
 import 'package:ml_linalg/dtype.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
+import 'dart:math' as math;
 
 import '../../mocks.dart';
 
 void main() {
   group('ClassifierAssessorImpl', () {
+    final generator = math.Random();
     final metricFactoryMock = MetricFactoryMock();
     final metricMock = MetricMock();
     final encoderFactoryMock = EncoderFactoryMock();
@@ -211,6 +213,18 @@ void main() {
           targetMock.toMatrix(dtype), positiveLabel, negativeLabel,
         ),
       );
+    });
+
+    test('should return score', () {
+      final score = generator.nextDouble();
+
+      when(
+          metricMock.getScore(argThat(anything), argThat(anything)),
+      ).thenReturn(score);
+
+      final actual = assessor.assess(classifierMock, metricType, samples);
+
+      expect(actual, equals(score));
     });
   });
 }

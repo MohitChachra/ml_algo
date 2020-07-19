@@ -99,10 +99,10 @@ abstract class SoftmaxRegressor implements
   /// [initialCoefficients] matrix is a vector of coefficients of a certain
   /// class.
   ///
-  /// [positiveLabel] Defines the value that will be used for `positive` class.
+  /// [positiveLabel] A value that will be used for the positive class.
   /// By default, `1`.
   ///
-  /// [negativeLabel] Defines the value that will be used for `negative` class.
+  /// [negativeLabel] A value that will be used for the negative class.
   /// By default, `0`.
   ///
   /// [collectLearningData] Whether or not to collect learning data, for

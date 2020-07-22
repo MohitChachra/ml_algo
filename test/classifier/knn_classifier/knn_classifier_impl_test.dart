@@ -495,22 +495,5 @@ void main() {
         expect(actual, throwsException);
       });
     });
-
-    group('allowedMetrics', () {
-      test('should contain proper allowed metrics', () {
-        final classifier = KnnClassifierImpl(
-          'target',
-          [1, 0],
-          KernelMock(),
-          KnnSolverMock(),
-          DType.float32,
-        );
-
-        expect(classifier.allowedMetrics, [
-          MetricType.accuracy,
-          MetricType.precision,
-        ]);
-      });
-    });
   });
 }

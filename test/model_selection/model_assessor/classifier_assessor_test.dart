@@ -1,16 +1,17 @@
+import 'dart:math' as math;
+
 import 'package:ml_algo/src/common/exception/invalid_metric_type_exception.dart';
 import 'package:ml_algo/src/metric/metric_type.dart';
-import 'package:ml_algo/src/model_selection/model_assessor/classifier_assessor_impl.dart';
+import 'package:ml_algo/src/model_selection/model_assessor/classifier_assessor.dart';
 import 'package:ml_dataframe/ml_dataframe.dart';
 import 'package:ml_linalg/dtype.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
-import 'dart:math' as math;
 
 import '../../mocks.dart';
 
 void main() {
-  group('ClassifierAssessorImpl', () {
+  group('ClassifierAssessor', () {
     final generator = math.Random();
     final metricFactoryMock = MetricFactoryMock();
     final metricMock = MetricMock();
@@ -18,7 +19,7 @@ void main() {
     final encoderMock = EncoderMock();
     final featureTargetSplitterMock = FeatureTargetSplitterMock();
     final classLabelsNormalizerMock = ClassLabelsNormalizerMock();
-    final assessor = ClassifierAssessorImpl(
+    final assessor = ClassifierAssessor(
       metricFactoryMock,
       encoderFactoryMock.create,
       featureTargetSplitterMock.split,

@@ -8,8 +8,8 @@ import 'package:ml_algo/src/metric/metric_type.dart';
 import 'package:ml_algo/src/model_selection/model_assessor/model_assessor.dart';
 import 'package:ml_dataframe/ml_dataframe.dart';
 
-class ClassifierAssessorImpl implements ModelAssessor<Classifier> {
-  ClassifierAssessorImpl(
+class ClassifierAssessor implements ModelAssessor<Classifier> {
+  ClassifierAssessor(
       this._metricFactory,
       this._encoderFactory,
       this._featuresTargetSplit,

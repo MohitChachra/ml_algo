@@ -194,19 +194,5 @@ void main() {
         collectLearningData: false,
       )).called(1);
     });
-
-    test('should contain appropriate metrics', () {
-      final regressor = LinearRegressor(
-        observations,
-        'target',
-        initialCoefficients: initialCoefficients,
-        collectLearningData: false,
-      );
-
-      expect(regressor.allowedMetrics, [
-        MetricType.mape,
-        MetricType.rmse,
-      ]);
-    });
   });
 }

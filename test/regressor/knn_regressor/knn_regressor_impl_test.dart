@@ -150,21 +150,5 @@ void main() {
         expect(regressor.predict(data).header, equals([targetName]));
       });
     });
-
-    group('allowedMetrics', () {
-      final regressor = KnnRegressorImpl(
-        'target',
-        KnnSolverMock(),
-        KernelMock(),
-        DType.float32,
-      );
-
-      test('should contain appropriate metrics', () {
-        expect(regressor.allowedMetrics, [
-          MetricType.mape,
-          MetricType.rmse,
-        ]);
-      });
-    });
   });
 }

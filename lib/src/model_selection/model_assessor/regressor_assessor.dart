@@ -1,7 +1,5 @@
 import 'package:ml_algo/ml_algo.dart';
-import 'package:ml_algo/src/classifier/classifier.dart';
 import 'package:ml_algo/src/common/exception/invalid_metric_type_exception.dart';
-import 'package:ml_algo/src/di/dependencies.dart';
 import 'package:ml_algo/src/helpers/features_target_split.dart';
 import 'package:ml_algo/src/metric/metric_factory.dart';
 import 'package:ml_algo/src/metric/metric_type.dart';
@@ -9,8 +7,8 @@ import 'package:ml_algo/src/model_selection/model_assessor/model_assessor.dart';
 import 'package:ml_algo/src/predictor/predictor.dart';
 import 'package:ml_dataframe/ml_dataframe.dart';
 
-class RegressorAssessorImpl implements ModelAssessor<Predictor> {
-  RegressorAssessorImpl(this._metricFactory);
+class RegressorAssessor implements ModelAssessor<Predictor> {
+  RegressorAssessor(this._metricFactory);
 
   static const List<MetricType> _allowedMetricTypes = [
     MetricType.rmse,
@@ -24,8 +22,7 @@ class RegressorAssessorImpl implements ModelAssessor<Predictor> {
       Predictor regressor,
       MetricType metricType,
       DataFrame samples,
-      ) {
-
+  ) {
     if (!_allowedMetricTypes.contains(metricType)) {
       throw InvalidMetricTypeException(
           metricType, _allowedMetricTypes);

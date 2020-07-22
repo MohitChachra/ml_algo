@@ -1,8 +1,7 @@
 import 'package:ml_algo/src/helpers/validate_test_features.dart';
 import 'package:ml_algo/src/knn_kernel/kernel.dart';
 import 'package:ml_algo/src/knn_solver/knn_solver.dart';
-import 'package:ml_algo/src/predictor/assessable_predictor_mixin.dart';
-import 'package:ml_algo/src/regressor/_mixins/regression_metrics_mixin.dart';
+import 'package:ml_algo/src/regressor/_mixins/assessable_regressor_mixin.dart';
 import 'package:ml_algo/src/regressor/knn_regressor/knn_regressor.dart';
 import 'package:ml_dataframe/ml_dataframe.dart';
 import 'package:ml_linalg/dtype.dart';
@@ -11,8 +10,7 @@ import 'package:ml_linalg/vector.dart';
 
 class KnnRegressorImpl
     with
-        AssessablePredictorMixin,
-        RegressionMetricsMixin
+        AssessableRegressorMixin
     implements
         KnnRegressor {
   KnnRegressorImpl(

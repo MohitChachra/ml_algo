@@ -2,7 +2,7 @@ import 'package:ml_algo/src/classifier/classifier.dart';
 import 'package:ml_algo/src/di/dependencies.dart';
 import 'package:ml_algo/src/metric/metric_type.dart';
 import 'package:ml_algo/src/model_selection/assessable.dart';
-import 'package:ml_algo/src/model_selection/model_assessor/model_assessor.dart';
+import 'package:ml_algo/src/model_selection/model_assessor/classifier_assessor.dart';
 import 'package:ml_dataframe/ml_dataframe.dart';
 
 mixin AssessableClassifierMixin implements
@@ -14,6 +14,6 @@ mixin AssessableClassifierMixin implements
       DataFrame samples,
       MetricType metricType,
   ) => dependencies
-        .getDependency<ModelAssessor<Classifier>>()
+        .getDependency<ClassifierAssessor>()
         .assess(this, metricType, samples);
 }

@@ -1,11 +1,8 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:ml_algo/src/classifier/_mixins/classification_metrics_mixin.dart';
+import 'package:ml_algo/src/classifier/_mixins/assessable_classifier_mixin.dart';
 import 'package:ml_algo/src/classifier/decision_tree_classifier/decision_tree_classifier.dart';
 import 'package:ml_algo/src/classifier/decision_tree_classifier/decision_tree_json_keys.dart';
 import 'package:ml_algo/src/common/serializable/serializable_mixin.dart';
-import 'package:ml_algo/src/di/dependencies.dart';
-import 'package:ml_algo/src/metric/metric_type.dart';
-import 'package:ml_algo/src/model_selection/model_assessor/model_assessor.dart';
 import 'package:ml_algo/src/tree_trainer/leaf_label/leaf_label.dart';
 import 'package:ml_algo/src/tree_trainer/tree_node/_helper/from_tree_node_json.dart';
 import 'package:ml_algo/src/tree_trainer/tree_node/_helper/tree_node_to_json.dart';
@@ -22,8 +19,8 @@ part 'decision_tree_classifier_impl.g.dart';
 @JsonSerializable()
 class DecisionTreeClassifierImpl
     with
-        SerializableMixin,
-        ClassificationMetricsMixin
+        AssessableClassifierMixin,
+        SerializableMixin
     implements
         DecisionTreeClassifier {
 
@@ -112,14 +109,6 @@ class DecisionTreeClassifierImpl
       header: targetNames,
     );
   }
-
-  @override
-  double assess(
-    DataFrame samples,
-    MetricType metricType,
-  ) => dependencies
-      .getDependency<ModelAssessor>()
-      .assess(this, metricType, samples);
 
   TreeLeafLabel _getLabelForSample(Vector sample, TreeNode node) {
     if (node.isLeaf) {

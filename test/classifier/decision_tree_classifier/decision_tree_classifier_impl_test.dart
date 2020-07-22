@@ -206,15 +206,6 @@ void main() {
       expect(classifier.treeRootNode, isNotNull);
     });
 
-    test('should contain proper allowed metrics', () {
-      final classifier = DecisionTreeClassifierImpl.fromJson(classifier32Json);
-
-      expect(classifier.allowedMetrics, [
-        MetricType.accuracy,
-        MetricType.precision,
-      ]);
-    });
-
     test('should call metric factory while assessing a model, '
         'dtype=DType.float32', () {
       final metricType = MetricType.precision;
